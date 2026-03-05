@@ -127,8 +127,16 @@ class LLMToolAdapter:
         if not model.startswith("gemini/") and not model.startswith("anthropic/") and not model.startswith("vertex_ai/"):
             if config.openai_base_url:
                 params["api_base"] = config.openai_base_url
+            # Default to a browser-like UA to reduce the chance of upstream WAF blocks.
+            headers: Dict[str, str] = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) "
+                    "Gecko/20100101 Firefox/123.0"
+                )
+            }
             if config.openai_base_url and "aihubmix.com" in config.openai_base_url:
-                params["extra_headers"] = {"APP-Code": "GPIJ3886"}
+                headers["APP-Code"] = "GPIJ3886"
+            params["extra_headers"] = headers
         return params
 
     def _init_litellm(self) -> None:

@@ -184,8 +184,16 @@ def _call_litellm_vision(image_b64: str, mime_type: str) -> str:
     if not model.startswith("gemini/") and not model.startswith("anthropic/") and not model.startswith("vertex_ai/"):
         if cfg.openai_base_url:
             call_kwargs["api_base"] = cfg.openai_base_url
+
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) "
+                "Gecko/20100101 Firefox/123.0"
+            )
+        }
         if cfg.openai_base_url and "aihubmix.com" in cfg.openai_base_url:
-            call_kwargs["extra_headers"] = {"APP-Code": "GPIJ3886"}
+            headers["APP-Code"] = "GPIJ3886"
+        call_kwargs["extra_headers"] = headers
 
     response = litellm.completion(**call_kwargs)
     if response and response.choices and response.choices[0].message.content:
